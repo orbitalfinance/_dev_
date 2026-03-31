@@ -2,7 +2,7 @@
 pragma solidity ^0.8.30; //this is solidity version , ^ for current and newer
 
 // Remix VM has a local test blockchain to deploy contracts 
-// 21000 gas is the amount to send ethers between accounts (less than modifying the state of the blockchain)
+// 2300 gas is the amount to send ethers between accounts (less than modifying the state of the blockchain)
 
 contract SimpleStorage {
 

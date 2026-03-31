@@ -75,7 +75,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"mapping.sol": "SimpleStorage"
+			"inheritance.sol": "SimpleStoragePlusOne"
 		},
 		"evmVersion": "prague",
 		"libraries": {},
@@ -89,6 +89,14 @@
 		"remappings": []
 	},
 	"sources": {
+		"inheritance.sol": {
+			"keccak256": "0xf84e912c745b75060078cbb1b53cb5b9ff90e6d71501d35d5e9783fd2b19e5eb",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ad0f30552a3616268bc3f379826beb96cb411a90952004090e77b71325e64553",
+				"dweb:/ipfs/QmUcuLozugVMmJRHNNfo8wsEgXaVrpTKzd77UUVYYJ8jo5"
+			]
+		},
 		"mapping.sol": {
 			"keccak256": "0x8f96ece42d095a5503847c8415a7583ded0ad0a2e411822a93a20187a5075330",
 			"license": "MIT",
