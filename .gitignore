@@ -6,3 +6,5 @@
 **/.vscode/
 **/.DS_Store
 solidity101/
+.deps
+.states
