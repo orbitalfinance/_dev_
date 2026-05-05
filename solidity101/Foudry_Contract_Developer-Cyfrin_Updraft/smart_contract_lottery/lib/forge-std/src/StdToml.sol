@@ -1,5 +1,7 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
-pragma solidity >=0.8.13 <0.9.0;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.6.0 <0.9.0;
+
+pragma experimental ABIEncoderV2;
 
 import {VmSafe} from "./Vm.sol";
 
@@ -8,24 +10,20 @@ import {VmSafe} from "./Vm.sol";
 // ```
 // using stdToml for string;
 // string memory toml = vm.readFile("<some_path>");
-// toml.readUint("<toml_path>");
+// toml.readUint("<json_path>");
 // ```
 // To write:
 // ```
 // using stdToml for string;
-// string memory toml = "toml";
-// toml.serialize("a", uint256(123));
-// string memory semiFinal = toml.serialize("b", string("test"));
-// string memory finalToml = toml.serialize("c", semiFinal);
-// finalToml.write("<some_path>");
+// string memory json = "json";
+// json.serialize("a", uint256(123));
+// string memory semiFinal = json.serialize("b", string("test"));
+// string memory finalJson = json.serialize("c", semiFinal);
+// finalJson.write("<some_path>");
 // ```
 
 library stdToml {
     VmSafe private constant vm = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
-
-    function keyExists(string memory toml, string memory key) internal view returns (bool) {
-        return vm.keyExistsToml(toml, key);
-    }
 
     function parseRaw(string memory toml, string memory key) internal pure returns (bytes memory) {
         return vm.parseToml(toml, key);
@@ -87,106 +85,6 @@ library stdToml {
         return vm.parseTomlBytesArray(toml, key);
     }
 
-    function readUintOr(string memory toml, string memory key, uint256 defaultValue) internal view returns (uint256) {
-        return keyExists(toml, key) ? readUint(toml, key) : defaultValue;
-    }
-
-    function readUintArrayOr(string memory toml, string memory key, uint256[] memory defaultValue)
-        internal
-        view
-        returns (uint256[] memory)
-    {
-        return keyExists(toml, key) ? readUintArray(toml, key) : defaultValue;
-    }
-
-    function readIntOr(string memory toml, string memory key, int256 defaultValue) internal view returns (int256) {
-        return keyExists(toml, key) ? readInt(toml, key) : defaultValue;
-    }
-
-    function readIntArrayOr(string memory toml, string memory key, int256[] memory defaultValue)
-        internal
-        view
-        returns (int256[] memory)
-    {
-        return keyExists(toml, key) ? readIntArray(toml, key) : defaultValue;
-    }
-
-    function readBytes32Or(string memory toml, string memory key, bytes32 defaultValue)
-        internal
-        view
-        returns (bytes32)
-    {
-        return keyExists(toml, key) ? readBytes32(toml, key) : defaultValue;
-    }
-
-    function readBytes32ArrayOr(string memory toml, string memory key, bytes32[] memory defaultValue)
-        internal
-        view
-        returns (bytes32[] memory)
-    {
-        return keyExists(toml, key) ? readBytes32Array(toml, key) : defaultValue;
-    }
-
-    function readStringOr(string memory toml, string memory key, string memory defaultValue)
-        internal
-        view
-        returns (string memory)
-    {
-        return keyExists(toml, key) ? readString(toml, key) : defaultValue;
-    }
-
-    function readStringArrayOr(string memory toml, string memory key, string[] memory defaultValue)
-        internal
-        view
-        returns (string[] memory)
-    {
-        return keyExists(toml, key) ? readStringArray(toml, key) : defaultValue;
-    }
-
-    function readAddressOr(string memory toml, string memory key, address defaultValue)
-        internal
-        view
-        returns (address)
-    {
-        return keyExists(toml, key) ? readAddress(toml, key) : defaultValue;
-    }
-
-    function readAddressArrayOr(string memory toml, string memory key, address[] memory defaultValue)
-        internal
-        view
-        returns (address[] memory)
-    {
-        return keyExists(toml, key) ? readAddressArray(toml, key) : defaultValue;
-    }
-
-    function readBoolOr(string memory toml, string memory key, bool defaultValue) internal view returns (bool) {
-        return keyExists(toml, key) ? readBool(toml, key) : defaultValue;
-    }
-
-    function readBoolArrayOr(string memory toml, string memory key, bool[] memory defaultValue)
-        internal
-        view
-        returns (bool[] memory)
-    {
-        return keyExists(toml, key) ? readBoolArray(toml, key) : defaultValue;
-    }
-
-    function readBytesOr(string memory toml, string memory key, bytes memory defaultValue)
-        internal
-        view
-        returns (bytes memory)
-    {
-        return keyExists(toml, key) ? readBytes(toml, key) : defaultValue;
-    }
-
-    function readBytesArrayOr(string memory toml, string memory key, bytes[] memory defaultValue)
-        internal
-        view
-        returns (bytes[] memory)
-    {
-        return keyExists(toml, key) ? readBytesArray(toml, key) : defaultValue;
-    }
-
     function serialize(string memory jsonKey, string memory rootObject) internal returns (string memory) {
         return vm.serializeJson(jsonKey, rootObject);
     }
@@ -195,7 +93,10 @@ library stdToml {
         return vm.serializeBool(jsonKey, key, value);
     }
 
-    function serialize(string memory jsonKey, string memory key, bool[] memory value) internal returns (string memory) {
+    function serialize(string memory jsonKey, string memory key, bool[] memory value)
+        internal
+        returns (string memory)
+    {
         return vm.serializeBool(jsonKey, key, value);
     }
 
@@ -254,7 +155,10 @@ library stdToml {
         return vm.serializeBytes(jsonKey, key, value);
     }
 
-    function serialize(string memory jsonKey, string memory key, string memory value) internal returns (string memory) {
+    function serialize(string memory jsonKey, string memory key, string memory value)
+        internal
+        returns (string memory)
+    {
         return vm.serializeString(jsonKey, key, value);
     }
 

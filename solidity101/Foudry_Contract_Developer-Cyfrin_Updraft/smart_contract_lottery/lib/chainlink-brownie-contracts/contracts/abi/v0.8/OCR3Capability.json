@@ -1,13 +1,12 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "message",
-        "type": "string"
-      }
-    ],
-    "name": "InvalidConfig",
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "ReportInvalid",
     "type": "error"
   },
   {
@@ -38,9 +37,9 @@
       },
       {
         "indexed": false,
-        "internalType": "bytes[]",
+        "internalType": "address[]",
         "name": "signers",
-        "type": "bytes[]"
+        "type": "address[]"
       },
       {
         "indexed": false,
@@ -202,9 +201,9 @@
   {
     "inputs": [
       {
-        "internalType": "bytes[]",
+        "internalType": "address[]",
         "name": "_signers",
-        "type": "bytes[]"
+        "type": "address[]"
       },
       {
         "internalType": "address[]",
@@ -254,33 +253,46 @@
     "inputs": [
       {
         "internalType": "bytes32[3]",
-        "name": "",
+        "name": "reportContext",
         "type": "bytes32[3]"
       },
       {
         "internalType": "bytes",
-        "name": "",
+        "name": "report",
         "type": "bytes"
       },
       {
         "internalType": "bytes32[]",
-        "name": "",
+        "name": "rs",
         "type": "bytes32[]"
       },
       {
         "internalType": "bytes32[]",
-        "name": "",
+        "name": "ss",
         "type": "bytes32[]"
       },
       {
         "internalType": "bytes32",
-        "name": "",
+        "name": "rawVs",
         "type": "bytes32"
       }
     ],
     "name": "transmit",
     "outputs": [],
-    "stateMutability": "pure",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "transmitters",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -293,7 +305,7 @@
         "type": "string"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "pure",
     "type": "function"
   }
 ]

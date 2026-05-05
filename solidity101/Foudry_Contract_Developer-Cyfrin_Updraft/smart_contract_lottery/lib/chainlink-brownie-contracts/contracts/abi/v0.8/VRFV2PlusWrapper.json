@@ -890,7 +890,7 @@
     "inputs": [
       {
         "internalType": "uint32",
-        "name": "_size",
+        "name": "size",
         "type": "uint32"
       }
     ],

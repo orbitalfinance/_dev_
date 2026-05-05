@@ -71,6 +71,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
     /** Events */
     event RaffleEntered(address indexed player);
     event WinnerPicked(address indexed winner);
+    event RequestRaffleWinner(uint256 indexed requestId);
 
     constructor(
         uint256 entranceFee,
@@ -97,15 +98,16 @@ contract Raffle is VRFConsumerBaseV2Plus {
         //  require(msg.value >= i_entranceFee,"Not enough ETH sent!" );
         // Sol2:
         //  require(msg.value >= i_entranceFee, NotEnoughEthToEnterRaffle());
-        if (msg.value <= i_entranceFee) {
+        if (msg.value < i_entranceFee) {
             revert Raffle_NotEnoughEthToEnterRaffle();
         }
-        s_players.push(payable(msg.sender));
-        emit RaffleEntered(msg.sender);
 
         if (s_raffleState != RaffleState.OPEN) {
             revert Raffle_RaffleNotOpen();
         }
+
+        s_players.push(payable(msg.sender));
+        emit RaffleEntered(msg.sender);
     }
 
     /**
@@ -161,6 +163,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
         // It is a 2 transactions process: request the RNG (Random Number Generator) and get the RNG.
 
         uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
+        emit RequestRaffleWinner(requestId); // It is redundant, already present in VRFCoordinator
     }
 
     function fulfillRandomWords(
@@ -183,7 +186,23 @@ contract Raffle is VRFConsumerBaseV2Plus {
     }
 
     /**Getter functions */
-    function getEntranceFee() public view returns (uint256) {
+    function getEntranceFee() external view returns (uint256) {
         return i_entranceFee;
+    }
+
+    function getRaffleState() external view returns (RaffleState) {
+        return s_raffleState;
+    }
+
+    function getPlayers() external view returns (address payable[] memory) {
+        return s_players;
+    }
+
+    function getLastTimeStamp() external view returns (uint256) {
+        return s_lastTimeStamp;
+    }
+
+    function getRecentWinner() external view returns (address) {
+        return s_recentWinner;
     }
 }

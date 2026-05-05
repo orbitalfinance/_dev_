@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.24;
+pragma solidity 0.8.19;
 
-import {ITypeAndVersion} from "../../../shared/interfaces/ITypeAndVersion.sol";
-import {IDelegateForwarder} from "../interfaces/IDelegateForwarder.sol";
+import {TypeAndVersionInterface} from "../../../interfaces/TypeAndVersionInterface.sol";
+import {DelegateForwarderInterface} from "../interfaces/DelegateForwarderInterface.sol";
 // solhint-disable-next-line no-unused-import
-import {IForwarder} from "../interfaces/IForwarder.sol";
+import {ForwarderInterface} from "../interfaces/ForwarderInterface.sol";
 
 import {CrossDomainForwarder} from "../CrossDomainForwarder.sol";
 import {CrossDomainOwnable} from "../CrossDomainOwnable.sol";
@@ -16,7 +16,7 @@ import {Address} from "../../../vendor/openzeppelin-solidity/v4.7.3/contracts/ut
 /// @notice L2 Contract which receives messages from a specific L1 address and transparently forwards them to the destination.
 /// @dev Any other L2 contract which uses this contract's address as a privileged position,
 /// can be considered to be simultaneously owned by the `l1Owner` and L2 `owner`
-contract ScrollCrossDomainGovernor is IDelegateForwarder, ITypeAndVersion, CrossDomainForwarder {
+contract ScrollCrossDomainGovernor is DelegateForwarderInterface, TypeAndVersionInterface, CrossDomainForwarder {
   string public constant override typeAndVersion = "ScrollCrossDomainGovernor 1.0.0";
 
   address internal immutable i_scrollCrossDomainMessenger;
@@ -29,13 +29,13 @@ contract ScrollCrossDomainGovernor is IDelegateForwarder, ITypeAndVersion, Cross
     i_scrollCrossDomainMessenger = address(crossDomainMessengerAddr);
   }
 
-  /// @inheritdoc IForwarder
+  /// @inheritdoc ForwarderInterface
   /// @dev forwarded only if L2 Messenger calls with `msg.sender` being the L1 owner address, or called by the L2 owner
   function forward(address target, bytes memory data) external override onlyLocalOrCrossDomainOwner {
     Address.functionCall(target, data, "Governor call reverted");
   }
 
-  /// @inheritdoc IDelegateForwarder
+  /// @inheritdoc DelegateForwarderInterface
   /// @dev forwarded only if L2 Messenger calls with `msg.sender` being the L1 owner address, or called by the L2 owner
   function forwardDelegate(address target, bytes memory data) external override onlyLocalOrCrossDomainOwner {
     Address.functionDelegateCall(target, data, "Governor delegatecall reverted");

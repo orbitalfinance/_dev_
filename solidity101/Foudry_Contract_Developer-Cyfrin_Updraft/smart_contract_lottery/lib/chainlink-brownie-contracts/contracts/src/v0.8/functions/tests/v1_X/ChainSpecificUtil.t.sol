@@ -11,31 +11,22 @@ import {FunctionsResponse} from "../../dev/v1_X/libraries/FunctionsResponse.sol"
 import {FunctionsFulfillmentSetup} from "./Setup.t.sol";
 
 import {ArbGasInfo} from "../../../vendor/@arbitrum/nitro-contracts/src/precompiles/ArbGasInfo.sol";
-import {GasPriceOracle} from "../../../vendor/@eth-optimism/contracts-bedrock/v0.17.3/src/L2/GasPriceOracle.sol";
+import {OVM_GasPriceOracle} from "../../../vendor/@eth-optimism/contracts/v0.8.9/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 
-/// @notice #_getL1FeeUpperLimit Arbitrum
+/// @notice #_getCurrentTxL1GasFees Arbitrum
 /// @dev Arbitrum gas formula = L2 Gas Price * (Gas used on L2 + Extra Buffer for L1 cost)
 /// @dev where Extra Buffer for L1 cost = (L1 Estimated Cost / L2 Gas Price)
-contract ChainSpecificUtil__getL1FeeUpperLimit_Arbitrum is FunctionsFulfillmentSetup {
+contract ChainSpecificUtil__getCurrentTxL1GasFees_Arbitrum is FunctionsFulfillmentSetup {
   address private constant ARBGAS_ADDR = address(0x000000000000000000000000000000000000006C);
-  uint256 private constant WEI_PER_L1_CALLDATA_BYTE = 2_243_708_528;
+  uint256 private constant L1_FEE_WEI = 15_818_209_764_247;
 
-  uint256 private constant L1_FEE_ESTIMATE_WITH_OVERESTIMATION_WEI = 6_408_031_555_968;
-  uint256 private constant L1_FEE_WEI = 3_697_631_654_144;
-
-  uint96 l1FeeEstimateJuels = uint96((1e18 * L1_FEE_ESTIMATE_WITH_OVERESTIMATION_WEI) / uint256(LINK_ETH_RATE));
   uint96 l1FeeJuels = uint96((1e18 * L1_FEE_WEI) / uint256(LINK_ETH_RATE));
 
   function setUp() public virtual override {
-    uint256 unused = 0;
-    vm.mockCall(
-      ARBGAS_ADDR,
-      abi.encodeWithSelector(ArbGasInfo.getPricesInWei.selector),
-      abi.encode(unused, WEI_PER_L1_CALLDATA_BYTE, unused, unused, unused, unused)
-    );
+    vm.mockCall(ARBGAS_ADDR, abi.encodeWithSelector(ArbGasInfo.getCurrentTxL1GasFees.selector), abi.encode(L1_FEE_WEI));
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenArbitrumMainnet() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenArbitrumMainnet() public {
     // Set the chainID
     vm.chainId(42161);
 
@@ -44,19 +35,15 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Arbitrum is FunctionsFulfillmentS
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Arbitrum mainnet"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Arbitrum mainnet");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenArbitrumGoerli() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenArbitrumGoerli() public {
     // Set the chainID
     vm.chainId(421613);
 
@@ -65,19 +52,15 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Arbitrum is FunctionsFulfillmentS
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Arbitrum Goerli"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Arbitrum Goerli");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenArbitrumSepolia() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenArbitrumSepolia() public {
     // Set the chainID
     vm.chainId(421614);
 
@@ -86,43 +69,33 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Arbitrum is FunctionsFulfillmentS
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Arbitrum Sepolia"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Arbitrum Sepolia");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 }
 
-/// @notice #_getL1FeeUpperLimit Optimism
-/// @dev Optimism gas formula: https://docs.optimism.io/stack/transactions/fees#ecotone
-/// @dev Note that the docs fail to mention the calculation also requires a division by 10^6
-/// @dev See here: https://github.com/ethereum-optimism/specs/blob/main/specs/protocol/exec-engine.md#ecotone-l1-cost-fee-changes-eip-4844-da
-/// @dev Also, we conservatively assume all non-zero bytes: tx_compressed_size = tx_data_size_bytes
-contract ChainSpecificUtil__getL1FeeUpperLimit_Optimism is FunctionsFulfillmentSetup {
-  address private constant GAS_PRICE_ORACLE_ADDR = address(0x420000000000000000000000000000000000000F);
-  GasPriceOracle private constant GAS_PRICE_ORACLE = GasPriceOracle(GAS_PRICE_ORACLE_ADDR);
+/// @notice #_getCurrentTxL1GasFees Optimism
+/// @dev Optimism gas formula = ((l2_base_fee + l2_priority_fee) * l2_gas_used) + L1 data fee
+/// @dev where L1 data fee = l1_gas_price * ((count_zero_bytes(tx_data) * 4 + count_non_zero_bytes(tx_data) * 16) + fixed_overhead + noncalldata_gas) * dynamic_overhead
+contract ChainSpecificUtil__getCurrentTxL1GasFees_Optimism is FunctionsFulfillmentSetup {
+  address private constant OVM_GASPRICEORACLE_ADDR = address(0x420000000000000000000000000000000000000F);
+  uint256 private constant L1_FEE_WEI = 15_818_209_764_247;
 
-  uint256 private constant L1_FEE_WEI = 1_648_118_885_618;
-  uint256 private constant L1_FEE_ESTIMATE_WITH_OVERESTIMATION_WEI = (L1_FEE_WEI * (10_000 + 5_000)) / 10_000;
-
-  uint96 l1FeeEstimateJuels = uint96((1e18 * L1_FEE_ESTIMATE_WITH_OVERESTIMATION_WEI) / uint256(LINK_ETH_RATE));
   uint96 l1FeeJuels = uint96((1e18 * L1_FEE_WEI) / uint256(LINK_ETH_RATE));
 
   function setUp() public virtual override {
     vm.mockCall(
-      GAS_PRICE_ORACLE_ADDR,
-      abi.encodeWithSelector(GAS_PRICE_ORACLE.getL1FeeUpperBound.selector),
+      OVM_GASPRICEORACLE_ADDR,
+      abi.encodeWithSelector(OVM_GasPriceOracle.getL1Fee.selector),
       abi.encode(L1_FEE_WEI)
     );
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenOptimismMainnet() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenOptimismMainnet() public {
     // Set the chainID
     vm.chainId(10);
 
@@ -131,19 +104,15 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Optimism is FunctionsFulfillmentS
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Optimism mainnet"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Optimism mainnet");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenOptimismGoerli() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenOptimismGoerli() public {
     // Set the chainID
     vm.chainId(420);
 
@@ -152,19 +121,15 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Optimism is FunctionsFulfillmentS
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Optimism Goerli"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Optimism Goerli");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenOptimismSepolia() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenOptimismSepolia() public {
     // Set the chainID
     vm.chainId(11155420);
 
@@ -173,40 +138,33 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Optimism is FunctionsFulfillmentS
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Optimism Sepolia"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Optimism Sepolia");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 }
 
-/// @notice #_getL1FeeUpperLimit Base
-/// @dev Base gas formula uses Optimism formula since it is build on the OP chain stack (See comments above for Optimism tests)
-contract ChainSpecificUtil__getL1FeeUpperLimit_Base is FunctionsFulfillmentSetup {
-  address private constant GAS_PRICE_ORACLE_ADDR = address(0x420000000000000000000000000000000000000F);
-  GasPriceOracle private constant GAS_PRICE_ORACLE = GasPriceOracle(GAS_PRICE_ORACLE_ADDR);
+/// @notice #_getCurrentTxL1GasFees Base
+/// @dev Base gas formula uses Optimism formula = ((l2_base_fee + l2_priority_fee) * l2_gas_used) + L1 data fee
+/// @dev where L1 data fee = l1_gas_price * ((count_zero_bytes(tx_data) * 4 + count_non_zero_bytes(tx_data) * 16) + fixed_overhead + noncalldata_gas) * dynamic_overhead
+contract ChainSpecificUtil__getCurrentTxL1GasFees_Base is FunctionsFulfillmentSetup {
+  address private constant OVM_GASPRICEORACLE_ADDR = address(0x420000000000000000000000000000000000000F);
+  uint256 private constant L1_FEE_WEI = 15_818_209_764_247;
 
-  uint256 private constant L1_FEE_WEI = 1_648_118_885_618;
-  uint256 private constant L1_FEE_ESTIMATE_WITH_OVERESTIMATION_WEI = (L1_FEE_WEI * (10_000 + 5_000)) / 10_000;
-
-  uint96 l1FeeEstimateJuels = uint96((1e18 * L1_FEE_ESTIMATE_WITH_OVERESTIMATION_WEI) / uint256(LINK_ETH_RATE));
   uint96 l1FeeJuels = uint96((1e18 * L1_FEE_WEI) / uint256(LINK_ETH_RATE));
 
   function setUp() public virtual override {
     vm.mockCall(
-      GAS_PRICE_ORACLE_ADDR,
-      abi.encodeWithSelector(GAS_PRICE_ORACLE.getL1FeeUpperBound.selector),
+      OVM_GASPRICEORACLE_ADDR,
+      abi.encodeWithSelector(OVM_GasPriceOracle.getL1Fee.selector),
       abi.encode(L1_FEE_WEI)
     );
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenBaseMainnet() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenBaseMainnet() public {
     // Set the chainID
     vm.chainId(8453);
 
@@ -215,19 +173,15 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Base is FunctionsFulfillmentSetup
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Base mainnet"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Base mainnet");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenBaseGoerli() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenBaseGoerli() public {
     // Set the chainID
     vm.chainId(84531);
 
@@ -236,19 +190,15 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Base is FunctionsFulfillmentSetup
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Base Goerli"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Base Goerli");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 
-  function test__getL1FeeUpperLimit_SuccessWhenBaseSepolia() public {
+  function test__getCurrentTxL1GasFees_SuccessWhenBaseSepolia() public {
     // Set the chainID
     vm.chainId(84532);
 
@@ -257,15 +207,11 @@ contract ChainSpecificUtil__getL1FeeUpperLimit_Base is FunctionsFulfillmentSetup
 
     // Check request cost estimate
     uint96 expectedEstimatedTotalCostJuels = _getExpectedCostEstimate(s_requests[1].requestData.callbackGasLimit) +
-      l1FeeEstimateJuels;
-    assertEq(
-      s_requests[1].commitment.estimatedTotalCostJuels,
-      expectedEstimatedTotalCostJuels,
-      "Estimated cost mismatch for Base Sepolia"
-    );
+      l1FeeJuels;
+    assertEq(s_requests[1].commitment.estimatedTotalCostJuels, expectedEstimatedTotalCostJuels);
 
     // Check response actual cost
     uint96 expectedTotalCostJuels = _getExpectedCost(5416) + l1FeeJuels;
-    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels, "Response cost mismatch for Base Sepolia");
+    assertEq(s_responses[1].totalCostJuels, expectedTotalCostJuels);
   }
 }

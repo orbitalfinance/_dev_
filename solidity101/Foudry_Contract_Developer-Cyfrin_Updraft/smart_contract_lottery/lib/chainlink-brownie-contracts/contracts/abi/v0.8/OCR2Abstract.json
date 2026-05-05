@@ -22,9 +22,9 @@
       },
       {
         "indexed": false,
-        "internalType": "bytes[]",
+        "internalType": "address[]",
         "name": "signers",
-        "type": "bytes[]"
+        "type": "address[]"
       },
       {
         "indexed": false,
@@ -128,9 +128,9 @@
   {
     "inputs": [
       {
-        "internalType": "bytes[]",
+        "internalType": "address[]",
         "name": "signers",
-        "type": "bytes[]"
+        "type": "address[]"
       },
       {
         "internalType": "address[]",

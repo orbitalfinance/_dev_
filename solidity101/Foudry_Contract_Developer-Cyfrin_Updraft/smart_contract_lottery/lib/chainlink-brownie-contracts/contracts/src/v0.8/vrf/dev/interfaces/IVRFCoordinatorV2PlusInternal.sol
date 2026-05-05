@@ -57,7 +57,7 @@ interface IVRFCoordinatorV2PlusInternal is IVRFCoordinatorV2Plus {
   function s_requestCommitments(uint256 requestID) external view returns (bytes32);
 
   function fulfillRandomWords(
-    Proof calldata proof,
+    Proof memory proof,
     RequestCommitment memory rc,
     bool onlyPremium
   ) external returns (uint96);

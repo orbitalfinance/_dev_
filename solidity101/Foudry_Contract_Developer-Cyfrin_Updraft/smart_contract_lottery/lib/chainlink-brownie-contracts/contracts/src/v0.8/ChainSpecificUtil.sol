@@ -43,7 +43,6 @@ library ChainSpecificUtil {
   /// @dev Base is a OP stack based rollup and follows the same L1 pricing logic as Optimism.
   uint256 private constant BASE_MAINNET_CHAIN_ID = 8453;
   uint256 private constant BASE_GOERLI_CHAIN_ID = 84531;
-  uint256 private constant BASE_SEPOLIA_CHAIN_ID = 84532;
 
   // ------------ End Optimism Constants ------------
 
@@ -83,7 +82,7 @@ library ChainSpecificUtil {
    * @notice Returns the L1 fees that will be paid for the current transaction, given any calldata
    * @notice for the current transaction.
    * @notice When on a known Arbitrum chain, it uses ArbGas.getCurrentTxL1GasFees to get the fees.
-   * @notice On Arbitrum, there's no need to pass the provided calldata
+   * @notice On Arbitrum, the provided calldata is not used to calculate the fees.
    * @notice On Optimism, the provided calldata is passed to the OVM_GasPriceOracle predeploy
    * @notice and getL1Fee is called to get the fees.
    */
@@ -126,7 +125,7 @@ library ChainSpecificUtil {
 
   /**
    * @notice Return true if and only if the provided chain ID is an Optimism chain ID.
-   * @notice Note that optimism chain id's are also OP stack chain id's (e.g. Base).
+   * @notice Note that optimism chain id's are also OP stack chain id's.
    */
   function _isOptimismChainId(uint256 chainId) internal pure returns (bool) {
     return
@@ -134,8 +133,7 @@ library ChainSpecificUtil {
       chainId == OP_GOERLI_CHAIN_ID ||
       chainId == OP_SEPOLIA_CHAIN_ID ||
       chainId == BASE_MAINNET_CHAIN_ID ||
-      chainId == BASE_GOERLI_CHAIN_ID ||
-      chainId == BASE_SEPOLIA_CHAIN_ID;
+      chainId == BASE_GOERLI_CHAIN_ID;
   }
 
   function _calculateOptimismL1DataFee(uint256 calldataSizeBytes) internal view returns (uint256) {

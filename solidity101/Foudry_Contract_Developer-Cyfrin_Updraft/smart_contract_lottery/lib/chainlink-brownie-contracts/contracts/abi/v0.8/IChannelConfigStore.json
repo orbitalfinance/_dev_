@@ -3,21 +3,82 @@
     "inputs": [
       {
         "internalType": "uint32",
-        "name": "donId",
+        "name": "channelId",
         "type": "uint32"
       },
       {
-        "internalType": "string",
-        "name": "url",
-        "type": "string"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "sha",
-        "type": "bytes32"
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "reportFormat",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint64",
+            "name": "chainSelector",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint32[]",
+            "name": "streamIDs",
+            "type": "uint32[]"
+          }
+        ],
+        "internalType": "struct IChannelConfigStore.ChannelDefinition",
+        "name": "channelDefinition",
+        "type": "tuple"
       }
     ],
-    "name": "setChannelDefinitions",
+    "name": "addChannel",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "channelId",
+        "type": "uint32"
+      }
+    ],
+    "name": "getChannelDefinitions",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "reportFormat",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint64",
+            "name": "chainSelector",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint32[]",
+            "name": "streamIDs",
+            "type": "uint32[]"
+          }
+        ],
+        "internalType": "struct IChannelConfigStore.ChannelDefinition",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "channelId",
+        "type": "uint32"
+      }
+    ],
+    "name": "removeChannel",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
