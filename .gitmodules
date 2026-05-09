@@ -1,3 +1,9 @@
 [submodule "solidity101/Foudry_Contract_Developer-Cyfrin_Updraft/smart_contract_lottery/lib/foundry-devops"]
 	path = solidity101/Foudry_Contract_Developer-Cyfrin_Updraft/smart_contract_lottery/lib/foundry-devops
 	url = https://github.com/Cyfrin/foundry-devops
+[submodule "solidity101/Foudry_Contract_Developer-Cyfrin_Updraft/_advanced_/foundry-nft/lib/openzeppelin-contracts"]
+	path = solidity101/Foudry_Contract_Developer-Cyfrin_Updraft/_advanced_/foundry-nft/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "solidity101/Foudry_Contract_Developer-Cyfrin_Updraft/_advanced_/foundry-nft/lib/foundry-devops"]
+	path = solidity101/Foudry_Contract_Developer-Cyfrin_Updraft/_advanced_/foundry-nft/lib/foundry-devops
+	url = https://github.com/Cyfrin/foundry-devops

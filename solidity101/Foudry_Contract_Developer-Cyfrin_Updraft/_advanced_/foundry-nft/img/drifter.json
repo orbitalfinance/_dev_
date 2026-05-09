@@ -1,0 +1,11 @@
+{
+  "name": "DRFT",
+  "description": "A Drifter of test!",
+  "image": "ipfs://QmNVKbwHssTBWGJenZ1Sa72KA46EgJfCtB5aHRJCa7558Q",
+  "attributes": [
+    {
+      "trait_type": "aura",
+      "value": 0
+    }
+  ]
+}

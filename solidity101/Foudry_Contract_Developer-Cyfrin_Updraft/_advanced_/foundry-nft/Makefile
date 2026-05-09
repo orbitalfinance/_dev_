@@ -20,6 +20,7 @@ install:
 	rm -rf lib/forge-std lib/openzeppelin-contracts
 	forge install foundry-rs/forge-std@v1.8.2 --no-git
 	forge install OpenZeppelin/openzeppelin-contracts@v5.6.1 --no-git
+	forge installCyfrin/foundry-devops@v0.4.0 --no-git
 
 update: ; forge update
 build: ; forge build
@@ -33,13 +34,21 @@ anvil:
 NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
 
 ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
-	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(SEPOLIA_PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 endif
 
 deploy:
-	@forge script script/DeployToken.s.sol:DeployToken $(NETWORK_ARGS)
+	@forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS)
 
 deploy-sepolia:
-	@forge script script/DeployToken.s.sol:DeployToken --rpc-url $(SEPOLIA_RPC_URL) \
+	@forge script script/DeployBasicNft.s.sol:DeployBasicNft --rpc-url $(SEPOLIA_RPC_URL) \
 	--account mySepoliaAccount --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 
+deployDynamicNft:
+	@forge script script/DeployDynamicNft.s.sol:DeployDynamicNft $(NETWORK_ARGS)
+
+mint:
+	cast send 0x5FbDB2315678afecb367f032d93F642f64180aa3 "mintNft()" --private-key $(LOC_PRIVATE_KEY) --rpc-url $(LOC_RPC_URL)
+
+change-color:
+	cast send 0x5FbDB2315678afecb367f032d93F642f64180aa3 "changeColor(uint256)" 0 --private-key $(LOC_PRIVATE_KEY) --rpc-url $(LOC_RPC_URL)
